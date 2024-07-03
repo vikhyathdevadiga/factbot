@@ -1,0 +1,14 @@
+{
+    "name": "getSearchResult",
+    "description": "return the article links related to the message input",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The search query to use. For example: 'WhatsApp: WhatsApp sold to Ambani"
+        }
+      },
+      "required": []
+    }
+  }

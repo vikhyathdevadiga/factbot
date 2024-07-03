@@ -1,0 +1,19 @@
+{
+  "name": "factbot",
+  "version": "1.0.0",
+  "description": "An automated fact-checking WhatsApp bot powered by Twilio, OpenAI, and SerpAPI",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node app.js"
+  },
+  "author": "Vikhyath S",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "openai": "^4.52.2",
+    "serpapi": "^2.1.0",
+    "twilio": "^5.2.2"
+  }
+}

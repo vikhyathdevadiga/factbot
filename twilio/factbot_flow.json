@@ -1,0 +1,177 @@
+{
+    "description": "FactBot Flow",
+    "states": [
+      {
+        "name": "Trigger",
+        "type": "trigger",
+        "transitions": [
+          {
+            "next": "send_and_reply_1",
+            "event": "incomingMessage"
+          },
+          {
+            "event": "incomingCall"
+          },
+          {
+            "event": "incomingConversationMessage"
+          },
+          {
+            "event": "incomingRequest"
+          },
+          {
+            "event": "incomingParent"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 0,
+            "y": 0
+          }
+        }
+      },
+      {
+        "name": "send_and_reply_1",
+        "type": "send-and-wait-for-reply",
+        "transitions": [
+          {
+            "next": "split_1",
+            "event": "incomingMessage"
+          },
+          {
+            "event": "timeout"
+          },
+          {
+            "event": "deliveryFailure"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 20,
+            "y": 220
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "message_type": "custom",
+          "body": "Press 1 to Fact check this message. Press 2 to Cancel.",
+          "timeout": "3600"
+        }
+      },
+      {
+        "name": "split_1",
+        "type": "split-based-on",
+        "transitions": [
+          {
+            "event": "noMatch"
+          },
+          {
+            "next": "http_1",
+            "event": "match",
+            "conditions": [
+              {
+                "friendly_name": "If value equal_to 1",
+                "arguments": [
+                  "{{widgets.send_and_reply_1.inbound.Body}}"
+                ],
+                "type": "equal_to",
+                "value": "1"
+              }
+            ]
+          }
+        ],
+        "properties": {
+          "input": "{{widgets.send_and_reply_1.inbound.Body}}",
+          "offset": {
+            "x": -10,
+            "y": 470
+          }
+        }
+      },
+      {
+        "name": "http_1",
+        "type": "make-http-request",
+        "transitions": [
+          {
+            "next": "send_message_1",
+            "event": "success"
+          },
+          {
+            "next": "send_message_2",
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 230,
+            "y": 700
+          },
+          "method": "POST",
+          "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+          "add_twilio_auth": false,
+          "parameters": [
+            {
+              "value": "{{trigger.message.From}}",
+              "key": "From"
+            },
+            {
+              "value": "{{trigger.message.Body}}",
+              "key": "Body"
+            }
+          ],
+          "url": "<add_url>"
+        }
+      },
+      {
+        "name": "send_message_1",
+        "type": "send-message",
+        "transitions": [
+          {
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 5,
+            "y": 917
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "message_type": "custom",
+          "to": "{{contact.channel.address}}",
+          "body": "Verifying the message. Please wait...."
+        }
+      },
+      {
+        "name": "send_message_2",
+        "type": "send-message",
+        "transitions": [
+          {
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 460,
+            "y": 920
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "message_type": "custom",
+          "to": "{{contact.channel.address}}",
+          "body": "Something went wrong! Please try again...."
+        }
+      }
+    ],
+    "initial_state": "Trigger",
+    "flags": {
+      "allow_concurrent_calls": true
+    }
+  }
